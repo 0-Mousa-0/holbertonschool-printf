@@ -58,4 +58,3 @@ c += _putchar(no % 10 + '0');
 
 return (c);
 }
-
