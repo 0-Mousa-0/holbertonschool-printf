@@ -15,21 +15,19 @@ int _printf(const char *format, ...)
 
 	va_start(args, format);
 
-	while (*format)
+	while (*format) /*format != NULL*/
 	{
 		if (*format == '%')
 		{
 			format++;
-			if (*format == 'c')
-				i += _putchar(va_arg(args, int));
-			else if (*format == 's')
-				i += print_string(va_arg(args, char *));
-			else if (*format == '%')
-				i += _putchar('%');
-			else if (*format == 'd' || *format == 'i')
-				i += print_number(va_arg(args, int));
-			else if (*format == 'b')
-				i += print_binary(va_arg(args, unsigned int));
+			if (*format == 'u')
+				i += print_unsigned(va_arg(args, unsigned int));
+			else if (*format == 'o')
+				i += print_octal(va_arg(args, unsigned int));
+			else if (*format == 'x')
+                                i += print_hex_l(va_arg(args, unsigned int));
+			else if (*format == 'X')
+                                i += print_hex_u(va_arg(args, unsigned int));
 			else
 			{
 				i += _putchar('%');
