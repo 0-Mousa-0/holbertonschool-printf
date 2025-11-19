@@ -1,119 +1,86 @@
 #include "main.h"
 
-int _printf(const char *format, ...)
+int print_char(char *buf, int *idx, char c)
 {
-    char buf[1024];
-    int idx = 0, count = 0;
-    va_list args;
+    return buf_add(buf, idx, c);
+}
 
-    if (!format)
+int print_string(char *buf, int *idx, char *s)
+{
+    int count = 0;
+
+    if (!s)
+        s = "(null)";
+
+    while (*s)
+    {
+        if (buf_add(buf, idx, *s++) == -1)
+            return -1;
+        count++;
+    }
+    return count;
+}
+
+int print_int(char *buf, int *idx, int n)
+{
+    unsigned int num;
+    int count = 0;
+
+    if (n < 0)
+    {
+        if (buf_add(buf, idx, '-') == -1)
+            return -1;
+        count++;
+        num = -n;
+    }
+    else
+        num = n;
+
+    if (num / 10)
+        count += print_int(buf, idx, num / 10);
+
+    if (buf_add(buf, idx, (num % 10) + '0') == -1)
         return -1;
 
-    va_start(args, format);
+    return count + 1;
+}
+
+int _printf(const char *format, ...)
+{
+    va_list ap;
+    char buffer[BUF_SIZE];
+    int idx = 0, count = 0;
+
+    va_start(ap, format);
 
     while (*format)
     {
         if (*format != '%')
         {
-            if (buf_add(buf, &idx, *format) == -1)
+            if (buf_add(buffer, &idx, *format++) == -1)
                 return -1;
             count++;
-            format++;
-            continue;
         }
-
-        format++; /* skip % */
-
-        switch (*format)
+        else
         {
-            case 'c':
-                if (buf_add(buf, &idx, va_arg(args, int)) == -1)
-                    return -1;
-                count++;
-                break;
+            format++;
+            if (*format == 'c')
+                count += print_char(buffer, &idx, va_arg(ap, int));
+            else if (*format == 's')
+                count += print_string(buffer, &idx, va_arg(ap, char *));
+            else if (*format == 'd' || *format == 'i')
+                count += print_int(buffer, &idx, va_arg(ap, int));
+            else if (*format == '%')
+                count += buf_add(buffer, &idx, '%');
+            else
+                count += buf_add(buffer, &idx, *format);
 
-            case 's':
-                {
-                    int r = print_string(buf, &idx, va_arg(args, char *));
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case 'd':
-            case 'i':
-                {
-                    int r = print_signed(buf, &idx, va_arg(args, int));
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case 'u':
-                {
-                    int r = print_unsigned(buf, &idx, va_arg(args, unsigned int));
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case 'x':
-                {
-                    int r = print_base(buf, &idx, va_arg(args, unsigned int),
-                                       16, "0123456789abcdef");
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case 'X':
-                {
-                    int r = print_base(buf, &idx, va_arg(args, unsigned int),
-                                       16, "0123456789ABCDEF");
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case 'o':
-                {
-                    int r = print_base(buf, &idx, va_arg(args, unsigned int),
-                                       8, "01234567");
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case 'b':
-                {
-                    int r = print_base(buf, &idx, va_arg(args, unsigned int),
-                                       2, "01");
-                    if (r == -1) return -1;
-                    count += r;
-                }
-                break;
-
-            case '%':
-                if (buf_add(buf, &idx, '%') == -1)
-                    return -1;
-                count++;
-                break;
-
-            default:
-                /* Unknown specifier: print '%X' literally */
-                if (buf_add(buf, &idx, '%') == -1)
-                    return -1;
-                if (buf_add(buf, &idx, *format) == -1)
-                    return -1;
-                count += 2;
-                break;
+            format++;
         }
-
-        format++;
     }
 
-    buf_flush(buf, &idx);
-    va_end(args);
+    buf_flush(buffer, &idx);
+    va_end(ap);
+
     return count;
 }
-
