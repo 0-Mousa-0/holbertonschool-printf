@@ -1,111 +1,116 @@
 #include "main.h"
 
-int print_char(char *buf, int *idx, char c)
+/**
+ * print_char - prints a char
+ */
+int print_char(va_list ap, char *buff, int *buff_i)
 {
-    return buf_add(buf, idx, c);
+    char c = va_arg(ap, int);
+    return buff_push(c, buff, buff_i);
 }
 
-int print_string(char *buf, int *idx, char *s)
+/**
+ * print_string - prints a string
+ */
+int print_string(va_list ap, char *buff, int *buff_i)
 {
+    char *s = va_arg(ap, char *);
     int count = 0;
 
     if (!s)
         s = "(null)";
 
     while (*s)
-    {
-        if (buf_add(buf, idx, *s++) == -1)
-            return -1;
-        count++;
-    }
+        count += buff_push(*s++, buff, buff_i);
+
     return count;
 }
 
-int print_int(char *buf, int *idx, int n)
+/**
+ * print_percent - prints %
+ */
+int print_percent(char *buff, int *buff_i)
 {
-    unsigned int num;
+    return buff_push('%', buff, buff_i);
+}
+
+/**
+ * print_int - prints integer
+ */
+int print_int(va_list ap, char *buff, int *buff_i)
+{
+    long n = va_arg(ap, int);
     int count = 0;
 
     if (n < 0)
     {
-        if (buf_add(buf, idx, '-') == -1)
-            return -1;
-        count++;
-        num = -n;
+        count += buff_push('-', buff, buff_i);
+        n = -n;
     }
-    else
-        num = n;
 
-    if (num / 10)
-        count += print_int(buf, idx, num / 10);
+    if (n / 10)
+        count += print_int_helper(n / 10, buff, buff_i);
 
-    if (buf_add(buf, idx, (num % 10) + '0') == -1)
-        return -1;
-
-    return count + 1;
+    count += buff_push((n % 10) + '0', buff, buff_i);
+    return count;
 }
 
-/* New: print binary */
-int print_binary(char *buf, int *idx, unsigned int n)
+/* helper for recursion */
+int print_int_helper(long n, char *buff, int *buff_i)
 {
     int count = 0;
-    if (n > 1)
-        count += print_binary(buf, idx, n >> 1);
 
-    if (buf_add(buf, idx, (n & 1) + '0') == -1)
-        return -1;
+    if (n / 10)
+        count += print_int_helper(n / 10, buff, buff_i);
 
-    return count + 1;
+    count += buff_push((n % 10) + '0', buff, buff_i);
+
+    return count;
 }
 
+/**
+ * _printf - custom printf
+ */
 int _printf(const char *format, ...)
 {
     va_list ap;
-    char buffer[BUF_SIZE];
-    int idx = 0, count = 0;
+    char buff[1024];
+    int buff_i = 0, count = 0;
+    int i = 0;
 
     if (!format)
         return -1;
 
     va_start(ap, format);
 
-    while (*format)
+    while (format[i])
     {
-        if (*format != '%')
+        if (format[i] != '%')
         {
-            if (buf_add(buffer, &idx, *format++) == -1)
-                return -1;
-            count++;
+            count += buff_push(format[i], buff, &buff_i);
+            i++;
+            continue;
         }
-        else
+
+        i++;
+        if (!format[i])
+            break;
+
+        switch (format[i])
         {
-            format++;
-
-            if (*format == 'c')
-                count += print_char(buffer, &idx, va_arg(ap, int));
-
-            else if (*format == 's')
-                count += print_string(buffer, &idx, va_arg(ap, char *));
-
-            else if (*format == 'd' || *format == 'i')
-                count += print_int(buffer, &idx, va_arg(ap, int));
-
-            else if (*format == 'b')
-                count += print_binary(buffer, &idx, va_arg(ap, unsigned int));
-
-            else if (*format == '%')
-                count += buf_add(buffer, &idx, '%');
-
-            else
-                count += buf_add(buffer, &idx, *format);
-
-            format++;
+            case 'c': count += print_char(ap, buff, &buff_i); break;
+            case 's': count += print_string(ap, buff, &buff_i); break;
+            case '%': count += print_percent(buff, &buff_i); break;
+            case 'd':
+            case 'i': count += print_int(ap, buff, &buff_i); break;
+            default:
+                count += buff_push('%', buff, &buff_i);
+                count += buff_push(format[i], buff, &buff_i);
         }
+        i++;
     }
 
-    buf_flush(buffer, &idx);
+    buff_flush(buff, &buff_i);
     va_end(ap);
-
     return count;
 }
-
