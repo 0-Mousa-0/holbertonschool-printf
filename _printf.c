@@ -71,6 +71,32 @@ int print_int_helper(long n, char *buff, int *buff_i)
 /**
  * _printf - custom printf
  */
+int print_binary(unsigned int n, char *buff, int *buff_i)
+{
+    int count = 0;
+    unsigned int mask = 1 << 31;
+    int started = 0;
+
+    while (mask > 0)
+    {
+        if (n & mask)
+        {
+            count += buff_push('1', buff, buff_i);
+            started = 1;
+        }
+        else if (started)
+        {
+            count += buff_push('0', buff, buff_i);
+        }
+        mask >>= 1;
+    }
+
+    if (!started)
+        count += buff_push('0', buff, buff_i);
+
+    return count;
+}
+
 int _printf(const char *format, ...)
 {
     va_list ap;
@@ -103,6 +129,8 @@ int _printf(const char *format, ...)
             case '%': count += print_percent(buff, &buff_i); break;
             case 'd':
             case 'i': count += print_int(ap, buff, &buff_i); break;
+            case 'b':count += print_binary(va_arg(ap, unsigned int), buff, &buff_i); break;
+
             default:
                 count += buff_push('%', buff, &buff_i);
                 count += buff_push(format[i], buff, &buff_i);
