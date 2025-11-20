@@ -1,4 +1,3 @@
- 
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -15,5 +14,6 @@ int buf_flush(char *buf, int *idx);
 int print_char(char *buf, int *idx, char c);
 int print_string(char *buf, int *idx, char *s);
 int print_int(char *buf, int *idx, int n);
+int print_binary(char *buf, int *idx, unsigned int n);
 
 #endif
