@@ -21,4 +21,6 @@ int print_binary(unsigned int n, char *buff, int *buff_i);
 
 int print_int_helper(long n, char *buff, int *buff_i);
 
+
+int print_S(va_list args);
 #endif
