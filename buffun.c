@@ -3,15 +3,14 @@
 /* Add character to buffer */
 int buf_add(char *buf, int *idx, char c)
 {
-    if (*idx >= BUF_SIZE)
+    if (*idx == BUF_SIZE)
     {
         if (write(1, buf, *idx) == -1)
             return -1;
         *idx = 0;
     }
 
-    buf[*idx] = c;
-    (*idx)++;
+    buf[(*idx)++] = c;
     return 1;
 }
 
