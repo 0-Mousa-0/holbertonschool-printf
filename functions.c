@@ -1,15 +1,14 @@
 #include "main.h"
 
 /**
- * print_S - custom specifier %S
- * prints string, non printable chars as \xHH (uppercase hex)
+ * print_S - prints a string with non-printable chars in \xHH format
  */
 int print_S(va_list args)
 {
     char *s = va_arg(args, char *);
     int count = 0;
-    char hex_map[] = "0123456789ABCDEF";
     unsigned char c;
+    char hex_map[] = "0123456789ABCDEF";
 
     if (!s)
         s = "(null)";
@@ -20,9 +19,11 @@ int print_S(va_list args)
 
         if ((c > 0 && c < 32) || c >= 127)
         {
-            count += write(1, "\\x", 2);
-            count += write(1, &hex_map[c / 16], 1);
-            count += write(1, &hex_map[c % 16], 1);
+            /* always print exactly 2 hex digits */
+            write(1, "\\x", 2);
+            write(1, &hex_map[(c >> 4) & 0xF], 1);
+            write(1, &hex_map[c & 0xF], 1);
+            count += 4;
         }
         else
         {
