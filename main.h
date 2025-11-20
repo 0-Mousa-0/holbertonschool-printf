@@ -4,16 +4,17 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#define BUF_SIZE 1024
-
+/* main printf */
 int _printf(const char *format, ...);
 
-int buf_add(char *buf, int *idx, char c);
-void buf_flush(void);
+/* buffer functions */
+int buff_push(char c, char *buff, int *buff_i);
+int buff_flush(char *buff, int *buff_i);
 
-int print_char(char *buf, int *idx, char c);
-int print_string(char *buf, int *idx, char *s);
-int print_int(char *buf, int *idx, int n);
-int print_binary(char *buf, int *idx, unsigned int n);
+/* specifier handlers */
+int print_char(va_list ap, char *buff, int *buff_i);
+int print_string(va_list ap, char *buff, int *buff_i);
+int print_percent(char *buff, int *buff_i);
+int print_int(va_list ap, char *buff, int *buff_i);
 
 #endif
