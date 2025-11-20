@@ -17,4 +17,7 @@ int print_string(va_list ap, char *buff, int *buff_i);
 int print_percent(char *buff, int *buff_i);
 int print_int(va_list ap, char *buff, int *buff_i);
 
+
+int print_int_helper(long n, char *buff, int *buff_i);
+
 #endif
