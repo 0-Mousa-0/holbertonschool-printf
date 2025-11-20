@@ -130,6 +130,7 @@ int _printf(const char *format, ...)
             case 'd':
             case 'i': count += print_int(ap, buff, &buff_i); break;
             case 'b':count += print_binary(va_arg(ap, unsigned int), buff, &buff_i); break;
+            case 'S': count += print_S(ap); break;
 
             default:
                 count += buff_push('%', buff, &buff_i);
