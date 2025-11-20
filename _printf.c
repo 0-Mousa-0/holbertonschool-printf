@@ -1,49 +1,86 @@
 #include "main.h"
 
-/**
- * _printf - Produces output according to a format.
- * @format: The format string.
- * Return: The number of characters printed
- */
-int _printf(const char *format, ...)
+int print_char(char *buf, int *idx, char c)
 {
-	va_list args;
-	int i = 0;
-
-	if (!format || (format[0] == '%' && format[1] == '\0'))
-		return (-1);
-
-	va_start(args, format);
-
-	while (*format)
-	{
-		if (*format == '%')
-		{
-			format++;
-			if (*format == 'c')
-				i += _putchar(va_arg(args, int));
-			else if (*format == 's')
-				i += print_string(va_arg(args, char *));
-			else if (*format == '%')
-				i += _putchar('%');
-			else if (*format == 'd' || *format == 'i')
-				i += print_number(va_arg(args, int));
-			else if (*format == 'b')
-				i += print_binary(va_arg(args, unsigned int));
-			else if (*format == 'p')
-				i += print_pointer(va_arg(args, void *));
-			else
-			{
-				i += _putchar('%');
-				i += _putchar(*format);
-			}
-		}
-		else
-			i += _putchar(*format);
-		format++;
-	}
-
-	va_end(args);
-	return (i);
+    return buf_add(buf, idx, c);
 }
 
+int print_string(char *buf, int *idx, char *s)
+{
+    int count = 0;
+
+    if (!s)
+        s = "(null)";
+
+    while (*s)
+    {
+        if (buf_add(buf, idx, *s++) == -1)
+            return -1;
+        count++;
+    }
+    return count;
+}
+
+int print_int(char *buf, int *idx, int n)
+{
+    unsigned int num;
+    int count = 0;
+
+    if (n < 0)
+    {
+        if (buf_add(buf, idx, '-') == -1)
+            return -1;
+        count++;
+        num = -n;
+    }
+    else
+        num = n;
+
+    if (num / 10)
+        count += print_int(buf, idx, num / 10);
+
+    if (buf_add(buf, idx, (num % 10) + '0') == -1)
+        return -1;
+
+    return count + 1;
+}
+
+int _printf(const char *format, ...)
+{
+    va_list ap;
+    char buffer[BUF_SIZE];
+    int idx = 0, count = 0;
+
+    va_start(ap, format);
+
+    while (*format)
+    {
+        if (*format != '%')
+        {
+            if (buf_add(buffer, &idx, *format++) == -1)
+                return -1;
+            count++;
+        }
+        else
+        {
+            format++;
+            if (*format == 'c')
+                count += print_char(buffer, &idx, va_arg(ap, int));
+            else if (*format == 's')
+                count += print_string(buffer, &idx, va_arg(ap, char *));
+            else if (*format == 'd' || *format == 'i')
+                count += print_int(buffer, &idx, va_arg(ap, int));
+            else if (*format == '%')
+                count += buf_add(buffer, &idx, '%');
+            else
+                count += buf_add(buffer, &idx, *format);
+
+            format++;
+        }
+    }
+
+    buf_flush(buffer, &idx);
+    va_end(ap);
+
+    return count;
+}
