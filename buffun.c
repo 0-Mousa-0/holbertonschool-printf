@@ -1,20 +1,25 @@
 #include "main.h"
-/* Flush buffer */
-void buf_flush(void)
+
+/**
+ * buff_push - adds char to buffer; flushes when full
+ */
+int buff_push(char c, char *buff, int *buff_i)
 {
-    if (*idx > 0)
-    {
-     write(1, buf, *idx);
-        *idx = 0;
-    }
+    if (*buff_i >= 1024)
+        buff_flush(buff, buff_i);
+
+    buff[(*buff_i)++] = c;
     return 1;
 }
-/* Add character to buffer */
-int buf_add(char *buf, int *idx, char c)
-{
-    if (*idx >= BUF_SIZE)
-       buf_flush();
-       buf[idx++] = c;
-       return 1;
-}
 
+/**
+ * buff_flush - writes buffer content to stdout
+ */
+int buff_flush(char *buff, int *buff_i)
+{
+    if (*buff_i > 0)
+        write(1, buff, *buff_i);
+
+    *buff_i = 0;
+    return 0;
+}
