@@ -9,7 +9,7 @@
 int _printf(const char *format, ...);
 
 int buf_add(char *buf, int *idx, char c);
-int buf_flush(char *buf, int *idx);
+void buf_flush(void);
 
 int print_char(char *buf, int *idx, char c);
 int print_string(char *buf, int *idx, char *s);
