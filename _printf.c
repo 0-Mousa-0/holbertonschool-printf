@@ -7,53 +7,38 @@
  */
 int _printf(const char *format, ...)
 {
-    va_list args;
-    int count = 0;
-
-    if (format == NULL)
-        return (-1);
-
-    va_start(args, format);
-
+    /* ... your existing variable declarations ... */
+    
     while (*format)
     {
         if (*format == '%')
         {
             format++;
-            if (*format == '\0')
-                break;
-
+            /* ... your existing format parsing ... */
+            
             switch (*format)
             {
+                /* ... your existing cases ... */
                 case 'c':
-                    count += print_char(args);
+                    count += print_char(ap, buff, &buff_i);
                     break;
                 case 's':
-                    count += print_string(args);
+                    count += print_string(ap, buff, &buff_i);
                     break;
                 case '%':
-                    count += print_percent(args);
+                    count += print_percent(buff, &buff_i);
                     break;
                 case 'd':
                 case 'i':
-                    count += print_int(args);
+                    count += print_int(ap, buff, &buff_i);
                     break;
                 case 'p':
-                    count += print_pointer(args);
+                    count += print_pointer(ap, buff, &buff_i);
                     break;
-                default:
-                    count += write(1, "%", 1);
-                    count += write(1, format, 1);
-                    break;
+                /* ... your other cases ... */
             }
         }
-        else
-        {
-            count += write(1, format, 1);
-        }
-        format++;
+        /* ... rest of your existing code ... */
     }
-
-    va_end(args);
-    return (count);
+    /* ... your existing cleanup code ... */
 }
