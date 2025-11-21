@@ -14,9 +14,7 @@ int print_string(char *str)
     if (!str)
         str = "(null)";
     while (*str)
-    {
         count += _putchar(*str++);
-    }
     return count;
 }
 
@@ -49,6 +47,18 @@ int print_unsigned(unsigned int n)
     if (n / 10)
         count += print_unsigned(n / 10);
     count += _putchar(n % 10 + '0');
+
+    return count;
+}
+
+/* Prints octal number */
+int print_octal(unsigned int n)
+{
+    int count = 0;
+
+    if (n / 8)
+        count += print_octal(n / 8);
+    count += _putchar(n % 8 + '0');
 
     return count;
 }
