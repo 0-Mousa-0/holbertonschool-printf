@@ -3,24 +3,23 @@
 
 #include <stdarg.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-/* main printf */
+/* Main printf function */
 int _printf(const char *format, ...);
 
-/* buffer functions */
-int buff_push(char c, char *buff, int *buff_i);
-int buff_flush(char *buff, int *buff_i);
+/* Helper functions */
+int print_char(va_list args);
+int print_string(va_list args);
+int print_percent(va_list args);
+int print_int(va_list args);
+int print_pointer(va_list args);
 
-/* specifier handlers */
-int print_char(va_list ap, char *buff, int *buff_i);
-int print_string(va_list ap, char *buff, int *buff_i);
-int print_percent(char *buff, int *buff_i);
-int print_int(va_list ap, char *buff, int *buff_i);
-int print_binary(unsigned int n, char *buff, int *buff_i);
+/* Utility functions */
+int _putchar(char c);
+int print_number(int n);
+unsigned int print_unsigned(unsigned int n);
+int print_hex(unsigned long n, int uppercase);
 
-
-int print_int_helper(long n, char *buff, int *buff_i);
-
-
-int print_S(va_list args);
-#endif
+#endif /* MAIN_H */
