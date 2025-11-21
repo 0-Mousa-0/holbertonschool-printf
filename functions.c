@@ -1,62 +1,98 @@
 #include "main.h"
 
-/**
- * print_hex - prints hexadecimal number using buffer
- * @n: number to print
- * @buff: output buffer
- * @buff_i: buffer index pointer
- * @uppercase: 1 for uppercase, 0 for lowercase
- * Return: number of characters printed
- */
-int print_hex(unsigned long n, char *buff, int *buff_i, int uppercase)
+/* Prints a single character */
+int _putchar(char c)
 {
-    int count = 0;
-    char *digits = uppercase ? "0123456789ABCDEF" : "0123456789abcdef";
-
-    if (n / 16)
-        count += print_hex(n / 16, buff, buff_i, uppercase);
-
-    count += buff_push(digits[n % 16], buff, buff_i);
-    return (count);
+    return write(1, &c, 1);
 }
 
-/**
- * print_pointer - prints a pointer address using buffer
- * @ap: arguments list
- * @buff: output buffer
- * @buff_i: buffer index pointer
- * Return: number of characters printed
- */
-int print_pointer(va_list ap, char *buff, int *buff_i)
+/* Prints a string */
+int print_string(char *str)
 {
-    void *ptr = va_arg(ap, void *);
-    unsigned long address = (unsigned long)ptr;
     int count = 0;
 
-    if (ptr == NULL)
+    if (!str)
+        str = "(null)";
+    while (*str)
     {
-        /* Print "(nil)" for NULL pointer */
-        count += buff_push('(', buff, buff_i);
-        count += buff_push('n', buff, buff_i);
-        count += buff_push('i', buff, buff_i);
-        count += buff_push('l', buff, buff_i);
-        count += buff_push(')', buff, buff_i);
-        return (count);
+        count += _putchar(*str++);
     }
+    return count;
+}
 
-    /* Print "0x" prefix */
-    count += buff_push('0', buff, buff_i);
-    count += buff_push('x', buff, buff_i);
-    
-    /* Print hexadecimal address */
-    if (address == 0)
+/* Prints a signed integer */
+int print_number(int n)
+{
+    int count = 0;
+    unsigned int num;
+
+    if (n < 0)
     {
-        count += buff_push('0', buff, buff_i);
+        count += _putchar('-');
+        num = -n;
     }
     else
-    {
-        count += print_hex(address, buff, buff_i, 0);
-    }
+        num = n;
 
-    return (count);
+    if (num / 10)
+        count += print_number(num / 10);
+    count += _putchar(num % 10 + '0');
+
+    return count;
 }
+
+/* Prints unsigned integer */
+int print_unsigned(unsigned int n)
+{
+    int count = 0;
+
+    if (n / 10)
+        count += print_unsigned(n / 10);
+    count += _putchar(n % 10 + '0');
+
+    return count;
+}
+
+/* Prints hexadecimal lowercase */
+int print_hex_lower(unsigned int n)
+{
+    char hex[] = "0123456789abcdef";
+    int count = 0;
+
+    if (n / 16)
+        count += print_hex_lower(n / 16);
+    count += _putchar(hex[n % 16]);
+    return count;
+}
+
+/* Prints hexadecimal uppercase */
+int print_hex_upper(unsigned int n)
+{
+    char hex[] = "0123456789ABCDEF";
+    int count = 0;
+
+    if (n / 16)
+        count += print_hex_upper(n / 16);
+    count += _putchar(hex[n % 16]);
+    return count;
+}
+
+/* Prints pointer address */
+int print_pointer(void *ptr)
+{
+    int count = 0;
+    unsigned long addr;
+
+    if (!ptr)
+        return print_string("(nil)");
+
+    addr = (unsigned long)ptr;
+    count += print_string("0x");
+
+    if (addr / 16)
+        count += print_pointer((void *)(addr / 16));
+    count += _putchar("0123456789abcdef"[addr % 16]);
+
+    return count;
+}
+
