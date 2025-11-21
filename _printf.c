@@ -1,44 +1,49 @@
 #include "main.h"
 
-/**
- * _printf - produces output according to a format
- * @format: format string
- * Return: number of characters printed
- */
 int _printf(const char *format, ...)
 {
-    /* ... your existing variable declarations ... */
-    
-    while (*format)
+    va_list args;
+    int count = 0;
+    const char *ptr;
+
+    if (!format)
+        return -1;
+
+    va_start(args, format);
+    ptr = format;
+
+    while (*ptr)
     {
-        if (*format == '%')
+        if (*ptr == '%')
         {
-            format++;
-            /* ... your existing format parsing ... */
-            
-            switch (*format)
-            {
-                /* ... your existing cases ... */
-                case 'c':
-                    count += print_char(ap, buff, &buff_i);
-                    break;
-                case 's':
-                    count += print_string(ap, buff, &buff_i);
-                    break;
-                case '%':
-                    count += print_percent(buff, &buff_i);
-                    break;
-                case 'd':
-                case 'i':
-                    count += print_int(ap, buff, &buff_i);
-                    break;
-                case 'p':
-                    count += print_pointer(ap, buff, &buff_i);
-                    break;
-                /* ... your other cases ... */
-            }
+            ptr++;
+            if (*ptr == 'c')
+                count += _putchar(va_arg(args, int));
+            else if (*ptr == 's')
+                count += print_string(va_arg(args, char *));
+            else if (*ptr == 'd' || *ptr == 'i')
+                count += print_number(va_arg(args, int));
+            else if (*ptr == 'u')
+                count += print_unsigned(va_arg(args, unsigned int));
+            else if (*ptr == 'x')
+                count += print_hex_lower(va_arg(args, unsigned int));
+            else if (*ptr == 'X')
+                count += print_hex_upper(va_arg(args, unsigned int));
+            else if (*ptr == 'p')
+                count += print_pointer(va_arg(args, void *));
+            else if (*ptr == '%')
+                count += _putchar('%');
+            else
+                count += _putchar('%'), count += _putchar(*ptr);
         }
-        /* ... rest of your existing code ... */
+        else
+        {
+            count += _putchar(*ptr);
+        }
+        ptr++;
     }
-    /* ... your existing cleanup code ... */
+
+    va_end(args);
+    return count;
 }
+
