@@ -4,22 +4,21 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-/* Main printf function */
+/* Core _printf function */
 int _printf(const char *format, ...);
 
-/* Buffer functions */
-int buff_push(char c, char *buff, int *buff_i);
-void buff_flush(char *buff, int *buff_i);
-
 /* Helper functions */
-int print_char(va_list ap, char *buff, int *buff_i);
-int print_string(va_list ap, char *buff, int *buff_i);
-int print_percent(char *buff, int *buff_i);
-int print_int(va_list ap, char *buff, int *buff_i);
-int print_pointer(va_list ap, char *buff, int *buff_i);
-
-/* Utility functions */
-int print_hex(unsigned long n, char *buff, int *buff_i, int uppercase);
+int _putchar(char c);
+int print_string(char *str);
+int print_number(int n);
+int print_unsigned(unsigned int n);
+int print_octal(unsigned int n);
+int print_hex_lower(unsigned int n);
+int print_hex_upper(unsigned int n);
+int print_binary(unsigned int n);
+int print_pointer(void *ptr);
 
 #endif /* MAIN_H */
+
