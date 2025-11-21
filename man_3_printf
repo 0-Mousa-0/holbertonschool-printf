@@ -1,43 +1,61 @@
-.\" Manpage for _printf
-.\" Description: printf function implementation
-.\" Author: [Raghad Almalki / Mousa Alq¶arni]
-
-.TH _PRINTF 3 "2025" "1.0" "Custom Printf Manual"
+.TH _PRINTF 3 "2025" "Custom Library" "User Manual"
 
 .SH NAME
-_printf \- formatted output conversion
+_printf - custom formatted output conversion function
 
 .SH SYNOPSIS
-.nf
 .B #include "main.h"
 .PP
-.BI "int _printf(const char *" format ", ...);"
-.fi
+.B int _printf(const char *format, ...);
 
 .SH DESCRIPTION
 The
-.B _printf
+.B _printf()
 function produces output according to a
 .I format
-string and writes it to
-.B stdout,
-the standard output stream.
+string. It is a simplified custom implementation of the standard C
+.B printf(3)
+function.
 
-The
-.I format
-string is a character string composed of zero or more directives:
+.PP
+The function processes the format string one character at a time:
 .IP \(bu 2
-Ordinary characters (not
-.BR % ),
-which are copied unchanged to the output stream.
+Ordinary characters are written directly to standard output.
 .IP \(bu 2
-Conversion specifications, each of which results in fetching zero or more
-subsequent arguments. Each conversion specification is introduced by the
-.B %
-character and ends with a conversion specifier.
+A '%' character introduces a conversion specification used to format one
+or more additional arguments provided after the format string.
 
-.SH CONVERSION SPECIFIERS
-The following conversion specifiers are supported:
+.PP
+Unlike the standard
+.B printf(),
+this implementation supports only a limited subset of conversion
+specifiers and does not implement flags, field width, precision, or length
+modifiers. The goal is to demonstrate understanding of variable argument
+lists, memory handling, recursive printing, and low-level output.
+
+.SH ARCHITECTURE OVERVIEW
+The project is typically divided into the following components:
+
+.TP
+.B Format parser
+Reads the format string and identifies conversion specifiers.
+
+.TP
+.B Dispatcher
+Maps conversion specifiers to the correct handler function.
+
+.TP
+.B Printing helpers
+Low-level functions that print characters, numbers, strings, binary
+representations, and pointer addresses.
+
+.TP
+.B Output function
+Wraps the use of the
+.B write(2)
+system call, ensuring all output is written to file descriptor 1 (stdout).
+
+.SH SUPPORTED CONVERSION SPECIFIERS
 
 .TP
 .B %c
@@ -45,88 +63,357 @@ Prints a single character.
 
 .TP
 .B %s
-Prints a string of characters.
-
-.TP
-.B %%
-Prints a literal % character.
+Prints a null-terminated string.  
+If a NULL pointer is passed, the string "(null)" is printed.
 
 .TP
 .B %d, %i
-Prints a signed decimal integer.
+Prints a signed decimal integer.  
+Handles:
+.IP \(bu 2
+negative values  
+.IP \(bu 2
+the limits of 32-bit integers  
+.IP \(bu 2
+recursive printing for multi-digit values
 
-.PP
-The
-.B _printf
-function does not handle flag characters, field width, precision, or length modifiers.
+.TP
+.B %b
+Prints an unsigned integer in binary representation.
+
+.TP
+.B %p
+Prints a memory address in hexadecimal pointer format.  
+Typically prefixed with "0x".  
+If NULL is passed, prints "(nil)".
+
+.TP
+.B %%
+Prints a literal percent sign.
+
+.SH UNSUPPORTED FEATURES
+⚠️ The following are intentionally *not supported*:
+
+.IP \(bu 2
+Flags (-, +, space, #, 0)
+.IP \(bu 2
+Precision handling (.3f, .10s, etc.)
+.IP \(bu 2
+Width specifications (e.g., %8d)
+.IP \(bu 2
+Length modifiers (h, l, ll)
+.IP \(bu 2
+Floating-point formatting (%f, %g, %e)
+.IP \(bu 2
+Buffering and complex I/O
+.IP \(bu 2
+Locale-aware formatting
 
 .SH RETURN VALUE
-Upon successful return, the
-.B _printf
-function returns the number of characters printed (excluding the null byte used to end output to strings).
+On success,
+.B _printf()
+returns the total number of characters printed (excluding the terminating
+null byte).
 
-If an output error is encountered, a negative value is returned.
+On failure (for example, if the format string is NULL), the function
+returns -1.
 
-.SH EXAMPLES
-The following example demonstrates the use of
-.BR _printf :
+.SH ERROR HANDLING
+Errors may occur under the following conditions:
 
+.IP \(bu 2
+The format string is NULL.  
+.IP \(bu 2
+An unsupported specifier follows a '%' character.  
+.IP \(bu 2
+Memory allocation fails (for pointer conversion).  
+.IP \(bu 2
+The write system call returns an error.
+
+When an invalid specifier is encountered, the function prints the '%' and
+the invalid character unchanged, preserving behavior similar to the
+standard printf on some systems.
+
+.SH EXAMPLE USAGE
+
+.PP
 .nf
 #include "main.h"
 
 int main(void)
 {
     int len;
-    
-    len = _printf("Hello, %s!\\n", "world");
-    _printf("Printed %d characters\\n", len);
-    _printf("Character: %c, Number: %d\\n", 'A', 42);
-    _printf("Percent sign: %%\\n");
-    
+
+    len = _printf("Hello, %s!\\n", "Raghad");
+    _printf("Printed %d characters.\\n", len);
+
+    _printf("Char: %c, Number: %i\\n", 'A', 1234);
+    _printf("Binary: %b\\n", 15);
+    _printf("Pointer: %p\\n", (void *)0x1234abcd);
+    _printf("Percent: %%\\n");
+
     return (0);
 }
 .fi
 
-.SH COMPILATION
-Compile your code with:
-.nf
-.B gcc -Wall -Werror -Wextra -pedantic -std=gnu89 -Wno-format *.c
-.fi
+.SH INTERNAL FUNCTIONS
+The following helper functions may be used:
 
-.SH AUTHORED FUNCTIONS AND MACROS
-The implementation of
-.B _printf
-may use the following authorized functions:
 .IP \(bu 2
-.BR write (2)
+_putchar  
 .IP \(bu 2
-.BR malloc (3)
+print_string  
 .IP \(bu 2
-.BR free (3)
+print_number  
 .IP \(bu 2
-.BR va_start (3)
+print_binary  
 .IP \(bu 2
-.BR va_end (3)
+print_pointer  
 .IP \(bu 2
-.BR va_copy (3)
+write (system call)  
+
+.SH PERMITTED LIBRARIES
+This project allows the following C library features:
+
 .IP \(bu 2
-.BR va_arg (3)
+stdarg.h – va_start, va_end, va_arg, va_copy  
+.IP \(bu 2
+unistd.h – write  
+.IP \(bu 2
+stdlib.h – malloc, free  
+.IP \(bu 2
+stdint.h – integer types  
+
+.SH IMPLEMENTATION NOTES
+.IP \(bu 2
+Printing integers is typically implemented using recursion.  
+.IP \(bu 2
+Pointer conversion is implemented using manual hexadecimal conversion.  
+.IP \(bu 2
+Binary conversion repeatedly divides the number by 2.  
+.IP \(bu 2
+The function avoids using buffers unless required.  
+.IP \(bu 2
+The output is unbuffered and written directly to stdout.  
 
 .SH BUGS
-The
-.B _printf
-function is a custom implementation and may not handle all edge cases exactly like the standard
-.BR printf (3)
-function.
-
-This implementation does not handle buffer management like the C library printf function.
+This implementation does not fully match the behavior of the standard
+library
+.B printf(3),
+especially with formatting rules, width/precision, and undefined cases.
 
 .SH SEE ALSO
-.BR printf (3),
-.BR write (2),
-.BR stdarg (3)
+printf(3), fwrite(3), stdarg(3), write(2)
 
-.SH STANDARDS
-This implementation follows the GNU89 standard.
+.SH AUTHORS
+Raghad Almalki / Mousa Alqarni
+.TH _PRINTF 3 "2025" "Custom Library" "User Manual"
 
-.SH HISTORY
+.SH NAME
+_printf - custom formatted output conversion function
+
+.SH SYNOPSIS
+.B #include "main.h"
+.PP
+.B int _printf(const char *format, ...);
+
+.SH DESCRIPTION
+The
+.B _printf()
+function produces output according to a
+.I format
+string. It is a simplified custom implementation of the standard C
+.B printf(3)
+function.
+
+.PP
+The function processes the format string one character at a time:
+.IP \(bu 2
+Ordinary characters are written directly to standard output.
+.IP \(bu 2
+A '%' character introduces a conversion specification used to format one
+or more additional arguments provided after the format string.
+
+.PP
+Unlike the standard
+.B printf(),
+this implementation supports only a limited subset of conversion
+specifiers and does not implement flags, field width, precision, or length
+modifiers. The goal is to demonstrate understanding of variable argument
+lists, memory handling, recursive printing, and low-level output.
+
+.SH ARCHITECTURE OVERVIEW
+The project is typically divided into the following components:
+
+.TP
+.B Format parser
+Reads the format string and identifies conversion specifiers.
+
+.TP
+.B Dispatcher
+Maps conversion specifiers to the correct handler function.
+
+.TP
+.B Printing helpers
+Low-level functions that print characters, numbers, strings, binary
+representations, and pointer addresses.
+
+.TP
+.B Output function
+Wraps the use of the
+.B write(2)
+system call, ensuring all output is written to file descriptor 1 (stdout).
+
+.SH SUPPORTED CONVERSION SPECIFIERS
+
+.TP
+.B %c
+Prints a single character.
+
+.TP
+.B %s
+Prints a null-terminated string.  
+If a NULL pointer is passed, the string "(null)" is printed.
+
+.TP
+.B %d, %i
+Prints a signed decimal integer.  
+Handles:
+.IP \(bu 2
+negative values  
+.IP \(bu 2
+the limits of 32-bit integers  
+.IP \(bu 2
+recursive printing for multi-digit values
+
+.TP
+.B %b
+Prints an unsigned integer in binary representation.
+
+.TP
+.B %p
+Prints a memory address in hexadecimal pointer format.  
+Typically prefixed with "0x".  
+If NULL is passed, prints "(nil)".
+
+.TP
+.B %%
+Prints a literal percent sign.
+
+.SH UNSUPPORTED FEATURES
+⚠️ The following are intentionally *not supported*:
+
+.IP \(bu 2
+Flags (-, +, space, #, 0)
+.IP \(bu 2
+Precision handling (.3f, .10s, etc.)
+.IP \(bu 2
+Width specifications (e.g., %8d)
+.IP \(bu 2
+Length modifiers (h, l, ll)
+.IP \(bu 2
+Floating-point formatting (%f, %g, %e)
+.IP \(bu 2
+Buffering and complex I/O
+.IP \(bu 2
+Locale-aware formatting
+
+.SH RETURN VALUE
+On success,
+.B _printf()
+returns the total number of characters printed (excluding the terminating
+null byte).
+
+On failure (for example, if the format string is NULL), the function
+returns -1.
+
+.SH ERROR HANDLING
+Errors may occur under the following conditions:
+
+.IP \(bu 2
+The format string is NULL.  
+.IP \(bu 2
+An unsupported specifier follows a '%' character.  
+.IP \(bu 2
+Memory allocation fails (for pointer conversion).  
+.IP \(bu 2
+The write system call returns an error.
+
+When an invalid specifier is encountered, the function prints the '%' and
+the invalid character unchanged, preserving behavior similar to the
+standard printf on some systems.
+
+.SH EXAMPLE USAGE
+
+.PP
+.nf
+#include "main.h"
+
+int main(void)
+{
+    int len;
+
+    len = _printf("Hello, %s!\\n", "Raghad");
+    _printf("Printed %d characters.\\n", len);
+
+    _printf("Char: %c, Number: %i\\n", 'A', 1234);
+    _printf("Binary: %b\\n", 15);
+    _printf("Pointer: %p\\n", (void *)0x1234abcd);
+    _printf("Percent: %%\\n");
+
+    return (0);
+}
+.fi
+
+.SH INTERNAL FUNCTIONS
+The following helper functions may be used:
+
+.IP \(bu 2
+_putchar  
+.IP \(bu 2
+print_string  
+.IP \(bu 2
+print_number  
+.IP \(bu 2
+print_binary  
+.IP \(bu 2
+print_pointer  
+.IP \(bu 2
+write (system call)  
+
+.SH PERMITTED LIBRARIES
+This project allows the following C library features:
+
+.IP \(bu 2
+stdarg.h – va_start, va_end, va_arg, va_copy  
+.IP \(bu 2
+unistd.h – write  
+.IP \(bu 2
+stdlib.h – malloc, free  
+.IP \(bu 2
+stdint.h – integer types  
+
+.SH IMPLEMENTATION NOTES
+.IP \(bu 2
+Printing integers is typically implemented using recursion.  
+.IP \(bu 2
+Pointer conversion is implemented using manual hexadecimal conversion.  
+.IP \(bu 2
+Binary conversion repeatedly divides the number by 2.  
+.IP \(bu 2
+The function avoids using buffers unless required.  
+.IP \(bu 2
+The output is unbuffered and written directly to stdout.  
+
+.SH BUGS
+This implementation does not fully match the behavior of the standard
+library
+.B printf(3),
+especially with formatting rules, width/precision, and undefined cases.
+
+.SH SEE ALSO
+printf(3), fwrite(3), stdarg(3), write(2)
+
+.SH AUTHORS
+Raghad Almalki / Mousa Alqarni
+
