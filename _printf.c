@@ -25,6 +25,8 @@ int _printf(const char *format, ...)
                 count += print_number(va_arg(args, int));
             else if (*ptr == 'u')
                 count += print_unsigned(va_arg(args, unsigned int));
+            else if (*ptr == 'o')
+                count += print_octal(va_arg(args, unsigned int));
             else if (*ptr == 'x')
                 count += print_hex_lower(va_arg(args, unsigned int));
             else if (*ptr == 'X')
@@ -37,9 +39,8 @@ int _printf(const char *format, ...)
                 count += _putchar('%'), count += _putchar(*ptr);
         }
         else
-        {
             count += _putchar(*ptr);
-        }
+
         ptr++;
     }
 
