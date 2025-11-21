@@ -17,8 +17,11 @@ int print_unsigned(unsigned int n);
 int print_octal(unsigned int n);
 int print_hex_lower(unsigned int n);
 int print_hex_upper(unsigned int n);
-int print_binary(unsigned int n);
 int print_pointer(void *ptr);
+
+/* Buffer functions */
+void buff_push(char *buff, int *buff_i, char c);
+void buff_flush(char *buff, int *buff_i);
 
 #endif /* MAIN_H */
 
