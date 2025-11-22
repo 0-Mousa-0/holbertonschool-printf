@@ -17,7 +17,7 @@
   - [%X](#X---hex-uppercase)
   - [%S](#S---non-printable-string)
 
-- [Authors](#authors)
+- [Authors](#Authors)
 
 ---
 
@@ -365,3 +365,9 @@ case 'S':
     break;
 
 ---
+
+## Authors
+
+
+Raghad Almalki / Mousa Alqarni 
+SAU 1025 members 🔥.
