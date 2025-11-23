@@ -68,6 +68,8 @@ This modular design keeps `_printf` simple, readable, and easy to extend with ad
   int _printf(const char *format, ...);
 ```
 
+---
+
 ## Structure Of _prinf 
 
  ```c
