@@ -1,4 +1,4 @@
-# Printf Project (Holberton School-SAU 1025)
+# C-Printf Project (Holberton School-SAU 1025)
 ---
 
 ## Overview
@@ -66,7 +66,6 @@ This modular design keeps `_printf` simple, readable, and easy to extend with ad
 - Prototype:  
   ```c
   int _printf(const char *format, ...);
-```
 ---
 
 ## Structure Of _prinf 
