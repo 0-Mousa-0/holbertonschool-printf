@@ -35,6 +35,8 @@ int _printf(const char *format, ...)
                 count += print_pointer(va_arg(args, void *));
             else if (*ptr == '%')
                 count += _putchar('%');
+            else if (*ptr == 'S')
+                count += print_string_S(va_arg(args, char *));
             else
                 count += _putchar('%'), count += _putchar(*ptr);
         }
