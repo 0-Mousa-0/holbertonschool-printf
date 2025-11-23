@@ -72,7 +72,7 @@ This modular design keeps `_printf` simple, readable, and easy to extend with ad
 ## Structure Of _prinf
 
 ```c
-#include "main.h"
+ #include "main.h"
 
 /**
  * _printf - Custom printf function
