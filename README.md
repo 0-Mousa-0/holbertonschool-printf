@@ -66,12 +66,9 @@ This modular design keeps `_printf` simple, readable, and easy to extend with ad
 - Prototype:  
   ```c
   int _printf(const char *format, ...);
-```
----
 
-## Structure Of _prinf
+/* Structure Of _prinf */
 
-```c
  #include "main.h"
 
 /**
