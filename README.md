@@ -1,27 +1,7 @@
 # Printf Project (Holberton School-SAU 1025)
 ---
-## 📌 Table of Contents
-- [Overview](#^=^s^x Overview)
-- [How it's work](#��� How Formatted Output Works in `_printf`)
-- [Project Requirements](#^=^s^k Project Requirements)
-                              
-                            - [_printf function](#Structure Of _prinf)
-  - [%c](#c---character)
-  - [%s](#s---string)
-  - [%%](#---percent-sign)
-  - [%d, %i](#d---decimal && i---integer)
-  - [%b](#b---binary)
-  - [%u](#u---unsigned-integer)
-  - [%o](#o---octal)
-  - [%x](#x---hex-lowercase)
-  - [%X](#X---hex-uppercase)
-  - [%S](#S---non-printable-string)
 
-- [Authors](#Authors)
-
----
-
-## 📘 Overview
+## Overview
 This project is a custom implementation of the standard C library function `printf`.  
 The goal is to understand variadic functions, formatted output, buffer optimization, and custom specifiers.
 
@@ -29,10 +9,10 @@ The implementation handles a variety of format specifiers, including the require
 
 ---
 
-## 🧩 How Formatted Output Works in `_printf`
+## How Formatted Output Works in `_printf`
 
 The `_printf` function is a simplified custom implementation of the standard C library `printf`.  
-It reads a **format string** character by character and prints each character directly to the output, unless it encounters a **conversion directive** — a special sequence that starts with the `%` symbol.
+It reads a **format string** character by character and prints each character directly to the output, unless it encounters a **conversion directive** a special sequence that starts with the `%` symbol.
 
 A conversion directive tells `_printf` how to interpret the next argument passed through `va_list`, and how to format it before printing.
 
@@ -40,7 +20,9 @@ A conversion directive tells `_printf` how to interpret the next argument passed
 In this project, we implement a focused set of commonly-used specifiers that handle characters, strings, numbers, and custom formats.  
 Every specifier triggers a specific function responsible for formatting and printing the corresponding data type.
 
-### 🔍 Supported Format Specifiers
+---
+
+### Supported Format Specifiers
 
 | Specifier | Description |
 |----------|-------------|
@@ -55,7 +37,9 @@ Every specifier triggers a specific function responsible for formatting and prin
 | `%b` | Prints an unsigned integer in binary representation. |
 | `%S` | Prints a string, but converts non-printable ASCII characters into `\xHH` format (uppercase hex). |
 
-### 🛠 How `_printf` Handles Specifiers
+---
+
+### How `_printf` Handles Specifiers
 
 When `_printf` encounters a `%`, it immediately checks the next character to determine which handler to call.  
 For example:
@@ -77,12 +61,12 @@ This modular design keeps `_printf` simple, readable, and easy to extend with ad
 
 ---
 
-## 📋 Project Requirements
+## Project Requirements
 - Function prints formatted output to **stdout**
 - Prototype:  
   ```c
   int _printf(const char *format, ...);
-
+```
 ---
 
 ## Structure Of _prinf
@@ -125,7 +109,7 @@ int _printf(const char *format, ...)
     va_end(args);
     return count;
 }
-
+```
 ---
 
 ## c---character
@@ -140,7 +124,7 @@ int print_char(char c)
 case 'c':
     count += print_char(va_arg(args, int));
     break;
-
+```
 ---
 
 ## s---string
@@ -163,7 +147,7 @@ int print_string(char *s)
 case 's':
     count += print_string(va_arg(args, char *));
     break;
-
+```
 ---
 
 ## ---percent-sign
@@ -178,7 +162,7 @@ int print_percent(void)
 case '%':
     count += print_percent();
     break;
-
+```
 ---
 
 ## d---decimal && i---integer
@@ -214,7 +198,7 @@ case 'd':
 case 'i':
     count += print_int(va_arg(args, int));
     break;
-
+```
 ---
 
 ## b---binary
@@ -236,7 +220,7 @@ int print_binary(unsigned int n)
 case 'b':
     count += print_binary(va_arg(args, unsigned int));
     break;
-
+```
 ---
 
 ## u---unsigned-integer
@@ -258,7 +242,7 @@ int print_unsigned(unsigned int n)
 case 'u':
     count += print_unsigned(va_arg(args, unsigned int));
     break;
-
+```
 ---
 
 ## o---octal
@@ -280,7 +264,7 @@ int print_octal(unsigned int n)
 case 'o':
     count += print_octal(va_arg(args, unsigned int));
     break;
-
+```
 ---
 
 ## x---hex-lowercase
@@ -303,7 +287,7 @@ int print_hex_lower(unsigned int n)
 case 'x':
     count += print_hex_lower(va_arg(args, unsigned int));
     break;
-
+```
 ---
 
 ## X---hex-uppercase
@@ -326,7 +310,7 @@ int print_hex_upper(unsigned int n)
 case 'X':
     count += print_hex_upper(va_arg(args, unsigned int));
     break;
-
+```
 ---
 
 ## S---non-printable-string
@@ -363,6 +347,31 @@ int print_string_S(char *s)
 case 'S':
     count += print_string_S(va_arg(args, char *));
     break;
+```
+---
+
+## Buffer Optimization (1024 bytes)
+
+In this project, `_printf` uses a **local buffer of 1024 characters** instead of calling `write()` for every single character.  
+Calling `write()` repeatedly is an *expensive system operation*, especially when printing long strings or large numbers.  
+To improve efficiency, characters are first stored inside an internal buffer. Once the buffer is full—or when output is complete—the entire buffer is flushed to `stdout` in a **single write call**.
+
+### Why use a buffer?
+
+- Reduces the total number of system calls  
+- Improves performance when printing large outputs  
+- Matches part of the behavior of the standard `printf`, which also uses internal buffering  
+- Helps manage output more cleanly and consistently
+
+### How it works
+
+1. Every character to be printed is appended to a local array of size **1024**.
+2. If the buffer reaches capacity, `_printf` calls `write(1, buffer, length)` once.
+3. After flushing, the buffer resets and continues receiving new characters.
+4. At the very end of `_printf`, any remaining characters in the buffer are written out.
+
+This design ensures efficient output handling and avoids unnecessary overhead, making `_printf` faster and more consistent when working with larger strings or complex formatted output.
+
 
 ---
 
@@ -370,4 +379,4 @@ case 'S':
 
 
 Raghad Almalki / Mousa Alqarni 
-SAU 1025 members 🔥.
+SAU 1025 members.
