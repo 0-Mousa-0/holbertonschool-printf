@@ -106,3 +106,30 @@ int print_pointer(void *ptr)
     return count;
 }
 
+int print_string_S(char *s)
+{
+    int count = 0;
+    char hex[3];
+
+    if (!s)
+        s = "(null)";
+
+    while (*s)
+    {
+        if (*s < 32 || *s >= 127)
+        {
+            count += write(1, "\\x", 2);
+
+            sprintf(hex, "%02X", (unsigned char)*s);
+            count += write(1, hex, 2);
+        }
+        else
+        {
+            count += write(1, s, 1);
+        }
+        s++;
+    }
+
+    return count;
+}
+
