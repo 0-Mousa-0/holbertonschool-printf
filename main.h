@@ -8,7 +8,7 @@
 
 /* Core _printf function */
 int _printf(const char *format, ...);
-
+int print_string_S(char *s);
 /* Helper functions */
 int _putchar(char c);
 int print_string(char *str);
