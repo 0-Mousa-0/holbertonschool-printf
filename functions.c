@@ -1,5 +1,5 @@
 #include "main.h"
-
+#include <stdio.h>
 /* Prints a single character */
 int _putchar(char c)
 {
@@ -119,7 +119,6 @@ int print_string_S(char *s)
         if (*s < 32 || *s >= 127)
         {
             count += write(1, "\\x", 2);
-
             sprintf(hex, "%02X", (unsigned char)*s);
             count += write(1, hex, 2);
         }
@@ -129,7 +128,5 @@ int print_string_S(char *s)
         }
         s++;
     }
-
     return count;
 }
-
